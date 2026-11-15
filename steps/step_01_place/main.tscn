@@ -1,0 +1,193 @@
+[gd_scene load_steps=28 format=3]
+
+[ext_resource type="Script" path="res://steps/step_01_place/moon.gd" id="1"]
+[ext_resource type="Script" path="res://steps/step_01_place/moon_surface.gd" id="2"]
+[ext_resource type="Shader" path="res://steps/step_01_place/surface.gdshader" id="3"]
+[ext_resource type="Texture2D" path="res://materials/grain.tres" id="4"]
+[ext_resource type="Texture2D" path="res://materials/powder_normals.tres" id="5"]
+[ext_resource type="Texture2D" path="res://materials/rock_normals.tres" id="10"]
+[ext_resource type="Material" path="res://materials/moon_sky.tres" id="6"]
+[ext_resource type="PackedScene" path="res://steps/step_01_place/player.tscn" id="7"]
+[ext_resource type="Script" path="res://steps/step_01_place/hud.gd" id="8"]
+[ext_resource type="Script" path="res://steps/step_01_place/rocks.gd" id="11"]
+[ext_resource type="Shader" path="res://steps/step_01_place/rock.gdshader" id="12"]
+[ext_resource type="PackedScene" path="res://steps/step_01_place/dustwell.tscn" id="13"]
+[ext_resource type="PackedScene" path="res://models/tool_locker.glb" id="15"]
+[ext_resource type="Script" path="res://steps/step_01_place/tool_locker.gd" id="16"]
+[ext_resource type="Resource" path="res://steps/step_01_place/widebar.tres" id="17"]
+[ext_resource type="Resource" path="res://steps/step_01_place/dust_pack_4kg.tres" id="18"]
+[ext_resource type="Resource" path="res://steps/step_01_place/rotary_scrubber.tres" id="19"]
+[ext_resource type="Resource" path="res://steps/step_01_place/dustwell.tres" id="20"]
+
+[sub_resource type="ShaderMaterial" id="surface"]
+shader = ExtResource("3")
+shader_parameter/grain = ExtResource("4")
+shader_parameter/powder_normals = ExtResource("5")
+shader_parameter/rock_normals = ExtResource("10")
+
+[sub_resource type="ShaderMaterial" id="stone"]
+shader = ExtResource("12")
+
+[sub_resource type="Sky" id="sky"]
+sky_material = ExtResource("6")
+process_mode = 1
+
+[sub_resource type="Environment" id="environment"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 2
+ambient_light_color = Color(0.45, 0.55, 0.75, 1)
+ambient_light_energy = 0.6
+reflected_light_source = 2
+tonemap_mode = 2
+tonemap_white = 2.6
+ssao_enabled = true
+ssao_radius = 1.2
+glow_enabled = true
+glow_intensity = 0.35
+glow_bloom = 0.02
+glow_hdr_threshold = 1.4
+
+[sub_resource type="LabelSettings" id="big"]
+font_size = 30
+outline_size = 6
+outline_color = Color(0, 0, 0, 0.8)
+
+[sub_resource type="BoxShape3D" id="wall"]
+size = Vector3(30, 40, 1)
+
+[sub_resource type="BoxShape3D" id="wall_side"]
+size = Vector3(1, 40, 30)
+
+[sub_resource type="BoxShape3D" id="locker"]
+size = Vector3(1.8, 2.13, 1.12)
+
+[sub_resource type="LabelSettings" id="prompt"]
+font_size = 34
+outline_size = 8
+outline_color = Color(0, 0, 0, 0.85)
+
+[node name="Main" type="Node3D"]
+
+[node name="Moon" type="Node3D" parent="."]
+script = ExtResource("1")
+
+[node name="Surface" type="Node3D" parent="Moon"]
+script = ExtResource("2")
+material = SubResource("surface")
+
+[node name="Rocks" type="MultiMeshInstance3D" parent="Moon" node_paths=PackedStringArray("moon_surface")]
+material_override = SubResource("stone")
+script = ExtResource("11")
+moon_surface = NodePath("../Surface")
+
+[node name="Edge" type="StaticBody3D" parent="Moon"]
+collision_layer = 4
+
+[node name="North" type="CollisionShape3D" parent="Moon/Edge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -13.5)
+shape = SubResource("wall")
+
+[node name="South" type="CollisionShape3D" parent="Moon/Edge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 13.5)
+shape = SubResource("wall")
+
+[node name="East" type="CollisionShape3D" parent="Moon/Edge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.5, 0, 0)
+shape = SubResource("wall_side")
+
+[node name="West" type="CollisionShape3D" parent="Moon/Edge"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0, 0)
+shape = SubResource("wall_side")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("environment")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.94328509, 0.1351838, -0.30321375, 0, 0.91333902, 0.4072, 0.33198379, 0.38410569, -0.86153908, 0, 12, 0)
+light_color = Color(1, 0.97, 0.93, 1)
+light_energy = 2.0
+shadow_enabled = true
+directional_shadow_max_distance = 140.0
+
+[node name="Dustwell" parent="." instance=ExtResource("13")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 2.5, -1.25, 3.5)
+
+[node name="Locker" parent="." instance=ExtResource("15")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -3.5, -1.21, 4)
+script = ExtResource("16")
+row = Array[Resource]([ExtResource("17"), ExtResource("18"), ExtResource("19"), ExtResource("20")])
+
+[node name="Body" type="StaticBody3D" parent="Locker"]
+collision_layer = 4
+
+[node name="Box" type="CollisionShape3D" parent="Locker/Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.065, 0.16)
+shape = SubResource("locker")
+
+[node name="Text" type="Label3D" parent="Locker/Screen"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.015)
+pixel_size = 0.002
+modulate = Color(0.06, 0.1, 0.16, 1)
+outline_size = 0
+font_size = 42
+text = "WIDEBAR
+20 SCRIP"
+
+[node name="Player" parent="." node_paths=PackedStringArray("moon") instance=ExtResource("7")]
+moon = NodePath("../Moon")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 6)
+
+[node name="Hud" type="CanvasLayer" parent="." node_paths=PackedStringArray("moon", "player")]
+script = ExtResource("8")
+moon = NodePath("../Moon")
+player = NodePath("../Player")
+
+[node name="Panel" type="VBoxContainer" parent="Hud"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = 190.0
+grow_horizontal = 0
+
+[node name="Dust" type="Label" parent="Hud/Panel"]
+layout_mode = 2
+text = "DUST  0.0 kg"
+label_settings = SubResource("big")
+horizontal_alignment = 2
+
+[node name="Clean" type="Label" parent="Hud/Panel"]
+layout_mode = 2
+text = "CLEAN  0.0 %"
+label_settings = SubResource("big")
+horizontal_alignment = 2
+
+[node name="Pack" type="Label" parent="Hud/Panel"]
+layout_mode = 2
+text = "PACK  0.0 / 2.0 kg"
+label_settings = SubResource("big")
+horizontal_alignment = 2
+
+[node name="Scrip" type="Label" parent="Hud/Panel"]
+layout_mode = 2
+text = "SCRIP  0"
+label_settings = SubResource("big")
+horizontal_alignment = 2
+
+[node name="Prompt" type="Label" parent="Hud"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -400.0
+offset_top = -200.0
+offset_right = 400.0
+offset_bottom = -150.0
+grow_horizontal = 2
+grow_vertical = 0
+label_settings = SubResource("prompt")
+horizontal_alignment = 1

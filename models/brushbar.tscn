@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://models/brushbar.glb" id="1"]
+
+[node name="brushbar" instance=ExtResource("1")]
+metadata/footprint = Vector2(1, 0.24)
