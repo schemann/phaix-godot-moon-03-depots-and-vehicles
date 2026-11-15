@@ -22,9 +22,14 @@ that step. The project's main scene is the final step.
 
 ## Controls
 
-WASD or arrow keys or the left stick to walk, mouse or right stick to look, Space to jump,
-Esc gives the mouse back, a click captures it again. Further keys per tutorial are shown
-in the video and in the HUD.
+- W A S D or the arrow keys walk, and so does the left stick of a gamepad.
+- The mouse or the right stick looks around.
+- Space or the A button jumps.
+- Esc gives the mouse back, and a left click captures it again.
+- Hold the left mouse button or the right trigger to brush the dust away.
+- E or the X button uses the machine within reach (3.5 m of its middle), places the machine you carry, and gets you into a vehicle and out again. The line at the bottom of the screen says what it will do.
+- In a vehicle, W and S or the up and down arrows drive forward and back, A and D or the left and right arrows steer while it moves, the left stick does both, and the mouse or the right stick turns the camera around it.
+- Placing works from `step_01_place`, the vehicles from `step_02_crawler`.
 
 ## Tests
 
